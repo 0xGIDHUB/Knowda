@@ -14,7 +14,7 @@ export default function CardanoWalletHeaderComponent() {
         <div className="flex items-center gap-2">
           {/* Replace with your SVG or logo image if available */}
           <span className="text-2xl">❔</span>
-          <span className="text-2xl font-bold text-white"> KnowIt</span>
+          <span className="text-2xl font-bold text-white"> Knowda</span>
         </div>
         {/* Status Circle & Wallet */}
         <div className={`relative flex items-center gap-3`}>
