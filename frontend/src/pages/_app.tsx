@@ -3,12 +3,14 @@ import "@meshsdk/react/styles.css";
 import type { AppProps } from "next/app";
 import { MeshProvider } from "@meshsdk/react";
 import Layout from "@/components/Layout";
+import { Toaster } from "react-hot-toast";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <MeshProvider>
       <Layout>
         <Component {...pageProps} />
+        <Toaster position="top-center" />
       </Layout>
     </MeshProvider>
   );

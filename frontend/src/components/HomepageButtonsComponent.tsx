@@ -1,15 +1,19 @@
 import { useWallet } from "@meshsdk/react";
+import { useRouter } from "next/router";
 
 export default function HomepageButtonsComponent() {
   const { connected } = useWallet();
+  const router = useRouter();
+
   return (
     <div className="flex flex-row gap-12 justify-center items-center">
       {/* Create Game Button */}
       <div className="relative group">
         <button
-          className={`parallelogram bg-[#0b1636] ${connected ? 'text-white scale-100 hover:scale-110 transition-transform duration-200' : 'text-black'} font-bold py-4 px-10 text-xl transform -skew-x-12 shadow-lg rounded-lg border border-white ${!connected ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`parallelogram bg-[#0b1636] ${connected ? 'text-white scale-100 hover:scale-110 active:scale-95 transition-transform duration-200' : 'text-black'} font-bold py-4 px-10 text-xl transform -skew-x-12 shadow-lg rounded-lg border border-white ${!connected ? 'cursor-not-allowed opacity-70' : ''}`}
           style={{ minWidth: '140px' }}
           disabled={!connected}
+          onClick={() => connected && router.push("/create-game")}
         >
           <span className="block transform skew-x-12">Create Game</span>
         </button>
@@ -22,8 +26,9 @@ export default function HomepageButtonsComponent() {
       </div>
       {/* Join Game Button */}
       <button
-        className="parallelogram bg-[#0b1636] text-white font-bold py-4 px-10 text-xl transform -skew-x-12 scale-100 hover:scale-110 transition-transform duration-200 shadow-lg rounded-lg border border-white"
+        className="parallelogram bg-[#0b1636] text-white font-bold py-4 px-10 text-xl transform -skew-x-12 scale-100 hover:scale-110 active:scale-95 transition-transform duration-200 shadow-lg rounded-lg border border-white"
         style={{ minWidth: '140px' }}
+        onClick={() => router.push("/join-game")}
       >
         <span className="block transform skew-x-12">Join Game</span>
       </button>

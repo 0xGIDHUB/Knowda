@@ -7,7 +7,7 @@ use cocktail.{key_signed}
 
 
 // The KnowIt Dapp is a platform where players (5-20) participate in...
-// ...a quiz and the top three emerging winners recieve rewards in Ada.
+// ...a quiz and the top emerging winner(s) recieve rewards in Ada.
 
 // The smart contracts of the KnowIt Dapp enables locking of assets and...
 // ...automated payment of the locked tokens to the game winners.

@@ -22,7 +22,7 @@ export default function Home() {
       </h4>
       <p></p>
       <p className="text-base md:text-lg text-center font-light max-w-2xl opacity-90">
-        Show off your knowledge, top the quiz leaderboard, and earn Ada rewards in the <br></br> Knowda App! 
+        Prove your knowledge, top the quiz leaderboard, and earn Ada rewards in the <br></br> Knowda App! 
       </p>
     </div>
     {/* Buttons */}
