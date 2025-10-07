@@ -4,7 +4,7 @@ import {
 } from "@meshsdk/core";
 import { getScript, getTxBuilder, getUtxoByTxHash, meshWallet } from "./common";
 
-async function main() {
+export async function payWinner(txId: string, tokenAmount: number, payTo: string) {
   // get utxo, collateral and address from wallet
   const utxos = await meshWallet.getUtxos();
   const walletAddress = (await meshWallet.getUsedAddresses())[0];
@@ -15,10 +15,10 @@ async function main() {
   // hash of the public key of the wallet, to be used in the datum
   const signerHash = deserializeAddress(walletAddress).pubKeyHash;
   // redeemer value to unlock the funds
-  const amount = 10000000;
+  const amount = (Number(tokenAmount) + 1) * 1_000_000;
  
-  // get the utxo from the script address of the locked funds
-  const txHashFromDesposit = process.argv[2];
+  // get the script utxo from the transaction hash of the locked funds
+  const txHashFromDesposit = txId;
   const scriptUtxo = await getUtxoByTxHash(txHashFromDesposit);
 
 
@@ -36,7 +36,7 @@ async function main() {
     .txInRedeemerValue(mConStr0([amount])) // provide the required redeemer value
     .txInDatumValue(mConStr0([signerHash])) // only the owner of the wallet can unlock the funds
     .requiredSignerHash(signerHash)
-    .changeAddress(walletAddress) // Destination address for the unlocked utxo
+    .changeAddress(payTo) // Destination address for the unlocked utxo
     .txInCollateral(
       collateral.input.txHash,
       collateral.input.outputIndex,
@@ -49,8 +49,7 @@ async function main() {
  
   const signedTx = await meshWallet.signTx(unsignedTx);
   const txHash = await meshWallet.submitTx(signedTx);
-  console.log(`10 tADA unlocked from the contract at Tx ID: ${txHash}`);
 
+  return txHash;
 }
 
-main();

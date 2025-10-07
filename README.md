@@ -44,12 +44,12 @@ npm install
 
 **4. Setup the environment variables:**
 ```
-BLOCKFROST_PROVIDER=yourblockfrostproviderapi
+NEXT_PUBLIC_BLOCKFROST_PROVIDER=yourblockfrostproviderapi
 NEXT_PUBLIC_SUPABASE_URL=knowdasupabaseurl
 NEXT_PUBLIC_SUPABASE_ANON_KEY=knowdasupabasekey
-MESH_WALLET_PRIVATE_KEY=knowdameshwalletprivatekey
+NEXT_PUBLIC_MESH_WALLET_PRIVATE_KEY=knowdameshwalletprivatekey
 ```
-**4. Run the project:**
+**4. Startup the project:**
 ```bash
 npm run dev
 ```
@@ -85,7 +85,8 @@ Compiling gideon/knowda 0.0.0 (.)
 ```
 
 > [!NOTE]
-> To learn more about about the smart contract, check out the validator script which contains a lot of helpful comments [here](https://github.com/0xGIDHUB/Knowda/blob/main/smart-contract/validators/knowda.ak).
+> To learn more about about the smart contract, check out the validator script which contains a lot of helpful comments [here](https://github.com/0xGIDHUB/Knowda/blob/main/smart-contract/validators/knowda.ak).<br/>
+> Also, check out the mesh.js integration of the validator [here](https://github.com/0xGIDHUB/Knowda/tree/main/frontend/src/offchain).
 
 
 ## Documentation

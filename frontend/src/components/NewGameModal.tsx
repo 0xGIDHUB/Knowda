@@ -104,7 +104,7 @@ export default function NewGameModal({
             <input
               type="number"
               min={2}
-              placeholder="Minimum 2 minute"
+              placeholder="Minimum 2 minutes"
               value={formData.duration}
               onChange={(e) =>
                 setFormData({ ...formData, duration: Number(e.target.value) })

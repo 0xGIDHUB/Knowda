@@ -8,16 +8,16 @@ import {
   getGamesByOwner,
   deleteGame,
   updateGame,
-  getGameByPass, 
+  getGameByPass,
   activateGame,
-  updateGameTxId 
+  updateGameTxId
 } from "@/utils/game";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import EditGameModal from "@/components/EditGameModal";
 import SetQuestionsModal from "@/components/SetQuestionsModal";
 import toast from "react-hot-toast";
 import { lockAdaReward } from "@/offchain/lock";
-import {IWallet} from "@meshsdk/core";
+import { IWallet } from "@meshsdk/core";
 
 
 export default function CreateGamePage() {
@@ -40,10 +40,10 @@ export default function CreateGamePage() {
 
   // Redirect if wallet not connected
   useEffect(() => {
-    if (!connected) {
+    if (!connected && !loading) {
       router.replace("/");
     }
-  }, [connected, router]);
+  }, [connected, router, loading]);
 
   // Fetch wallet address
   useEffect(() => {
@@ -153,107 +153,107 @@ export default function CreateGamePage() {
   };
 
   // helper to truncate tx hash
-const truncateHash = (hash: string, start = 8, end = 8) =>
-  hash.length > start + end ? `${hash.slice(0, start)}...${hash.slice(-end)}` : hash;
+  const truncateHash = (hash: string, start = 8, end = 8) =>
+    hash.length > start + end ? `${hash.slice(0, start)}...${hash.slice(-end)}` : hash;
 
 
 
-const handleActivateGame = async (game: any, wallet: IWallet) => {
-  try {
-    // Step 1: Check game status
-    const gameInfo = await getGameByPass(game.game_pass);
-
-    if (gameInfo.game_state) {
-      toast.success("Game is currently active!");
-      router.push(`/host-game/${game.game_pass}`);
-      return;
-    }
-
-    // Step 2: Sign transaction before activation
-    let txHash: string | null = null;
+  const handleActivateGame = async (game: any, wallet: IWallet) => {
     try {
-      txHash = await lockAdaReward(game.reward_amount, wallet);
+      // Step 1: Check game status
+      const gameInfo = await getGameByPass(game.game_pass);
 
-      if (!txHash) {
+      if (gameInfo.game_state) {
+        toast.success("Game is currently active!");
+        router.push(`/host-game/${game.game_pass}`);
+        return;
+      }
+
+      // Step 2: Sign transaction before activation
+      let txHash: string | null = null;
+      try {
+        txHash = await lockAdaReward(game.reward_amount, wallet);
+
+        if (!txHash) {
+          toast.error("Transaction failed or cancelled");
+          return;
+        }
+
+        // Build explorer url (adjust if using preview/testnet)
+        const explorerUrl = `https://preview.cardanoscan.io/transaction/${txHash}`;
+
+        // Persistent toast with actions
+        toast.custom(
+          (t) => (
+            <div className="max-w-xl w-full bg-white text-slate-900 rounded-lg p-4 shadow-md flex flex-col gap-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-sm text-gray-500">Transaction submitted</div>
+                  <div className="font-medium text-sm mt-1">
+                    {truncateHash(txHash!)}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1 break-all">{txHash}</div>
+                </div>
+
+                <div className="flex flex-col items-end gap-2">
+                  <button
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(txHash!);
+                        toast.success("Transaction hash copied");
+                      } catch {
+                        toast.error("Copy failed");
+                      }
+                    }}
+                    className="text-sm bg-gray-100 px-3 py-1 rounded-md hover:bg-gray-200"
+                  >
+                    Copy
+                  </button>
+
+                  <a
+                    href={explorerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+                  >
+                    Explorer
+                  </a>
+
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="text-sm bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          ),
+          { duration: Infinity }
+        );
+      } catch (err) {
+        console.error("Transaction error:", err);
         toast.error("Transaction failed or cancelled");
         return;
       }
 
-      // Build explorer url (adjust if using preview/testnet)
-      const explorerUrl = `https://cardanoscan.io/transaction/${txHash}`;
-
-      // Persistent toast with actions
-      toast.custom(
-        (t) => (
-          <div className="max-w-xl w-full bg-white text-slate-900 rounded-lg p-4 shadow-md flex flex-col gap-3">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-sm text-gray-500">Transaction submitted</div>
-                <div className="font-medium text-sm mt-1">
-                  {truncateHash(txHash!)}
-                </div>
-                <div className="text-xs text-gray-500 mt-1 break-all">{txHash}</div>
-              </div>
-
-              <div className="flex flex-col items-end gap-2">
-                <button
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(txHash!);
-                      toast.success("Transaction hash copied");
-                    } catch {
-                      toast.error("Copy failed");
-                    }
-                  }}
-                  className="text-sm bg-gray-100 px-3 py-1 rounded-md hover:bg-gray-200"
-                >
-                  Copy
-                </button>
-
-                <a
-                  href={explorerUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
-                >
-                  Explorer
-                </a>
-
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="text-sm bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        ),
-        { duration: Infinity }
-      );
-    } catch (err) {
-      console.error("Transaction error:", err);
-      toast.error("Transaction failed or cancelled");
-      return;
-    }
-
-    // Step 3: Update Supabase
-    await activateGame(game.game_pass);if (txHash) {
-      const success = await updateGameTxId(game.game_pass, txHash);
-      if (!success) {
-        toast.error("Failed to save transaction ID in database");
+      // Step 3: Update Supabase
+      await activateGame(game.game_pass); if (txHash) {
+        const success = await updateGameTxId(game.game_pass, txHash);
+        if (!success) {
+          toast.error("Failed to save transaction ID in database");
+        }
       }
+
+      toast.success("Game activated successfully!");
+
+      // Step 4: Redirect
+      router.push(`/host-game/${game.game_pass}`);
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Failed to activate game");
     }
-
-    toast.success("Game activated successfully!");
-
-    // Step 4: Redirect
-    router.push(`/host-game/${game.game_pass}`);
-  } catch (err: any) {
-    console.error(err);
-    toast.error("Failed to activate game");
-  }
-};
+  };
 
 
 

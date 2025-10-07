@@ -8,7 +8,7 @@ import {
 import { applyParamsToScript } from "@meshsdk/core-cst";
 import blueprint from "./plutus.json";
  
-const blockchainProvider = new BlockfrostProvider(process.env.BLOCKFROST_PROVIDER!);
+const blockchainProvider = new BlockfrostProvider(process.env.NEXT_PUBLIC_BLOCKFROST_PROVIDER!);
  
 // wallet for signing transactions
 export const meshWallet = new MeshWallet({
@@ -17,7 +17,7 @@ export const meshWallet = new MeshWallet({
   submitter: blockchainProvider,
   key: {
     type: "root",
-    bech32: "xprv1uqgu6kdelwsjscsmrglzg3y6vlc7lfqv44rv2l3cvhv6xkk6s30xz3l4ej3s4wkae3t20eq2zstqw755n3stha0jcxt53qdygphd2m7qcla6t576tflhx6a8w773qstflk2vsg9h5nqk94esel3s7l54ey834fzv",
+    bech32:process.env.NEXT_PUBLIC_MESH_WALLET_PRIVATE_KEY!,
   },
 });
 

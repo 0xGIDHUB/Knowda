@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import { useWallet } from "@meshsdk/react";
-import { getGameInfo } from "../utils/game";
+import { getGameInfo, joinGame } from "../utils/game";
 
 export default function JoinGamePage() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function JoinGamePage() {
       const game = await getGameInfo(gamePass!);
 
       if (!game) {
-        toast.error(`Game with game pass ${gamePass} does not exist`);
+        toast.error(`Game with game pass '${gamePass}' does not exist!`);
         return;
       }
 
@@ -50,8 +50,20 @@ export default function JoinGamePage() {
         return;
       }
 
+      // Add player to supabase
+      const res = await joinGame(
+        Number(gamePass),
+        String(walletAddress),
+        String(nickname)
+      );
+
+      if (!res.success) {
+        toast.error("Error joining game!");
+        return;
+      }
+
       router.push({
-        pathname: "/game/" + game.game_pass,
+        pathname: "/join-game/" + game.game_pass,
         query: {
           gamePass,
           nickname,
@@ -70,7 +82,7 @@ export default function JoinGamePage() {
     <div className="flex items-start justify-center min-h-screen bg-[#1b2957] text-white relative px-4">
       {/* Card Section */}
       <div className="w-full max-w-md bg-[#0b1636] rounded-2xl shadow-lg p-8 flex flex-col gap-6 mt-40">
-
+        <div className='flex justify-center block text-l font-medium'> <h4>Join Game </h4></div>
         {/* Game Pass */}
         <div>
           <label className="block mb-2 text-sm font-medium">Game Pass</label>
@@ -86,9 +98,9 @@ export default function JoinGamePage() {
           />
         </div>
 
-        {/* Nickname */}
+        {/* Name */}
         <div>
-          <label className="block mb-2 text-sm font-medium">Nickname / Alias</label>
+          <label className="block mb-2 text-sm font-medium">Name / Alias</label>
           <input
             type="text"
             placeholder="Enter nickname..."
@@ -113,7 +125,7 @@ export default function JoinGamePage() {
           {walletFocused && (
             <p className="mt-2 text-xs text-center text-red-400">
               Ensure you enter the correct address! <br />
-              Entering wrong address will result in loss of reward.
+              Entering a wrong address will result in loss of reward.
             </p>
           )}
         </div>
@@ -130,7 +142,7 @@ export default function JoinGamePage() {
           }`}
         onClick={handleJoin}
       >
-        <span className="block transform skew-x-12">Join Game</span>
+        <span className="block transform skew-x-12">Enter</span>
       </button>
     </div>
   );
