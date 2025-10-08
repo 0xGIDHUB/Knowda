@@ -10,6 +10,7 @@
   <a href="#quick-start">Quick Start</a> •
   <a href="#testing-the-validator">Testing The Validator</a> •
   <a href="#documentation">Documentation</a> •
+  <a href="#video-demo">Video Demo</a> •
   <a href="#author">Author</a> •
   <a href="#acknowledgements">Acknowledgements</a>
 </p>
@@ -93,6 +94,9 @@ Compiling gideon/knowda 0.0.0 (.)
 Learn more about Knowda by checking out the documentation:
 + [Notion](https://hill-desert-843.notion.site/Knowda-27a87d3170f780688143cc3fc46ce0fc?source=copy_link)
 + [Word](https://1drv.ms/w/c/d1bc433b580bd566/ER4tNzo-F_NNnKj_QnNYCjcBZk6nNbSZuzYeAd6s7Ncgxg)
+
+## Video Demo
+Check out the video demo of the knowda app [here](https://drive.google.com/drive/folders/1JU7AbQ_kk4iTo2tsMqDU50fat2WWsB4T)
 
 ## Author
 + Gideon - [@0xGIDHUB](https://github.com/0xGIDHUB)
