@@ -41,7 +41,7 @@ export default function JoinGamePage() {
       }
 
       if (game.game_state !== true) {
-        toast.error("Game not active");
+        toast.error("Game closed!");
         return;
       }
 

@@ -79,7 +79,7 @@ export default function LeaderboardPage() {
                                         } max-w-md w-full bg-[#0b1636] border border-yellow-500 text-white shadow-lg rounded-xl p-5 flex flex-col gap-3`}
                                 >
                                     <h2 className="text-lg font-bold text-yellow-400">
-                                        {alreadyPaid ? "💰 Reward Paid" : "🪙 Reward Paid Successfully!"}
+                                        {alreadyPaid ? "💰 Congratulations! Reward Paid" : "🪙 Congratulations! Reward Paid Successfully!"}
                                     </h2>
                                     <p className="text-sm">
                                         Transaction Hash:{" "}

@@ -7,6 +7,7 @@ import {
   savePlayerAnswer,
   getGameQuestions,
   markPlayerCompleted,
+  checkPlayerCompleted,
 } from "@/utils/game";
 import { toast } from "react-hot-toast";
 import ConfirmJoinModal from "@/components/ConfirmJoinModal";
@@ -28,6 +29,28 @@ export default function GamePage() {
   const [selectedOption, setSelectedOption] = useState("");
   const [timeLeft, setTimeLeft] = useState(0);
   const [questionOver, setQuestionOver] = useState(false);
+
+  useEffect(() => {
+    const verifyPlayerStatus = async () => {
+      if (!gamePass || !walletAddress || !nickname) return;
+
+      try {
+        const isCompleted = await checkPlayerCompleted(
+          Number(gamePass),
+          walletAddress as string,
+          nickname as string
+        );
+
+        if (isCompleted) {
+          router.replace("/");
+        }
+      } catch (err) {
+        console.error("Error checking player status:", err);
+      }
+    };
+
+    verifyPlayerStatus();
+  }, [gamePass, walletAddress, nickname, router]);
 
   useEffect(() => {
     const fetchGame = async () => {

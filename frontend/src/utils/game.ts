@@ -288,6 +288,18 @@ export async function joinGame(
   }
 }
 
+export async function checkPlayerCompleted(gamePass: number, address: string, name: string) {
+  const { data, error } = await supabase
+    .from("game_players")
+    .select("completed")
+    .eq("game_pass", gamePass)
+    .eq("address", address)
+    .eq("name", name)
+    .single();
+
+  if (error) throw error;
+  return data?.completed === true;
+}
 
 export async function leaveGame(
   gamePass: number,
