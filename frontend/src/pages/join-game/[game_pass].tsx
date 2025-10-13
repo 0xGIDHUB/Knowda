@@ -14,6 +14,7 @@ import ConfirmJoinModal from "@/components/ConfirmJoinModal";
 
 
 export default function GamePage() {
+  const INITIAL_RENDER_DELAY = 3000; // delay in ms (2.5 seconds)
   const router = useRouter();
   const { gamePass, nickname, walletAddress } = router.query;
 
@@ -29,6 +30,12 @@ export default function GamePage() {
   const [selectedOption, setSelectedOption] = useState("");
   const [timeLeft, setTimeLeft] = useState(0);
   const [questionOver, setQuestionOver] = useState(false);
+  const [initialDelayOver, setInitialDelayOver] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setInitialDelayOver(true), INITIAL_RENDER_DELAY);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const verifyPlayerStatus = async () => {
@@ -237,16 +244,21 @@ export default function GamePage() {
       console.log(`✅ You scored ${result.totalPoints} / ${result.maxPoints}`);
 
       setTimeout(() => {
-        setIsCalculating(false);
+        // Keep loader visible until the new page loads
         setShowModal(false);
+
         router.push({
           pathname: "/join-game/result",
           query: {
             score: result.totalPoints,
             max: result.maxPoints,
           },
+        }).then(() => {
+          // After navigation completes, hide loader
+          setIsCalculating(false);
         });
       }, 2000);
+
 
     } catch (err) {
       console.error("Error calculating final score:", err);
@@ -255,14 +267,15 @@ export default function GamePage() {
   };
 
 
-  if (loading) {
+  if (loading || !initialDelayOver) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#1b2957] text-white">
         <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-        <p className="ml-4">Loading game...</p>
+        <p className="ml-4">Preparing game...</p>
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-[#1b2957] text-white flex flex-col">

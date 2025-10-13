@@ -10,6 +10,7 @@ import {
   updateGame,
   getGameByPass,
   activateGame,
+  resetGameBeforeActivation,
   updateGameTxId
 } from "@/utils/game";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
@@ -169,32 +170,27 @@ export default function CreateGamePage() {
         return;
       }
 
+      
       // Step 2: Sign transaction before activation
       let txHash: string | null = null;
       try {
         txHash = await lockAdaReward(game.reward_amount, wallet);
-
         if (!txHash) {
           toast.error("Transaction failed or cancelled");
           return;
         }
-
-        // Build explorer url (adjust if using preview/testnet)
+        
         const explorerUrl = `https://preview.cardanoscan.io/transaction/${txHash}`;
-
-        // Persistent toast with actions
+        
         toast.custom(
           (t) => (
             <div className="max-w-xl w-full bg-white text-slate-900 rounded-lg p-4 shadow-md flex flex-col gap-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-sm text-gray-500">Transaction submitted</div>
-                  <div className="font-medium text-sm mt-1">
-                    {truncateHash(txHash!)}
-                  </div>
+                  <div className="font-medium text-sm mt-1">{truncateHash(txHash!)}</div>
                   <div className="text-xs text-gray-500 mt-1 break-all">{txHash}</div>
                 </div>
-
                 <div className="flex flex-col items-end gap-2">
                   <button
                     onClick={async () => {
@@ -206,7 +202,7 @@ export default function CreateGamePage() {
                       }
                     }}
                     className="text-sm bg-gray-100 px-3 py-1 rounded-md hover:bg-gray-200"
-                  >
+                    >
                     Copy
                   </button>
 
@@ -215,14 +211,14 @@ export default function CreateGamePage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
-                  >
+                    >
                     Explorer
                   </a>
 
                   <button
                     onClick={() => toast.dismiss(t.id)}
                     className="text-sm bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
-                  >
+                    >
                     Close
                   </button>
                 </div>
@@ -236,18 +232,22 @@ export default function CreateGamePage() {
         toast.error("Transaction failed or cancelled");
         return;
       }
-
-      // Step 3: Update Supabase
-      await activateGame(game.game_pass); if (txHash) {
-        const success = await updateGameTxId(game.game_pass, txHash);
-        if (!success) {
-          toast.error("Failed to save transaction ID in database");
-        }
+      
+      // 🆕 Step 2.5: Reset participants and clear old data
+      const { success: resetSuccess, error } = await resetGameBeforeActivation(game.game_pass);
+      if (!resetSuccess) {
+        console.error(error);
+        toast.error("Failed to reset game data before activation");
+        return;
       }
 
+      // Step 3: Update Supabase
+      await activateGame(game.game_pass);
+      if (txHash) {
+        const success = await updateGameTxId(game.game_pass, txHash);
+        if (!success) toast.error("Failed to save transaction ID in database");
+      }
       toast.success("Game activated successfully!");
-
-      // Step 4: Redirect
       router.push(`/host-game/${game.game_pass}`);
     } catch (err: any) {
       console.error(err);

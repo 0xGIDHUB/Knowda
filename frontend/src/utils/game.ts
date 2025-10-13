@@ -130,9 +130,44 @@ export async function activateGame(gamePass: string) {
   if (error) throw error;
 }
 
+/**
+ * Reset a game before activation:
+ * - Sets current_no_of_participants to 0
+ * - Sets reward_paid to false
+ * - Deletes all player records for that game
+ */
+export async function resetGameBeforeActivation(gamePass: number) {
+  try {
+    // Step 1: Reset main game info fields
+    const { error: updateError } = await supabase
+      .from("game_info")
+      .update({
+        current_no_of_participants: 0,
+        reward_paid: false,
+      })
+      .eq("game_pass", gamePass);
+
+    if (updateError) throw new Error(updateError.message);
+
+    // Step 2: Delete all player rows for this game
+    const { error: deleteError } = await supabase
+      .from("game_players")
+      .delete()
+      .eq("game_pass", gamePass);
+
+    if (deleteError) throw new Error(deleteError.message);
+
+    console.log(`✅ Game ${gamePass} reset successfully.`);
+    return { success: true };
+  } catch (err) {
+    console.error("❌ Error resetting game before activation:", err);
+    return { success: false, error: err };
+  }
+}
+
 
 /**
- * Delete a game across all tables by game id
+ * Delete a game across all related tables by game id
  */
 export async function deleteGame(gameId: string) {
   try {
@@ -153,27 +188,32 @@ export async function deleteGame(gameId: string) {
       .from("game_questions")
       .delete()
       .eq("game_pass", gamePass);
-
     if (qError) throw new Error(qError.message);
 
     const { error: aError } = await supabase
       .from("game_answers")
       .delete()
       .eq("game_pass", gamePass);
-
     if (aError) throw new Error(aError.message);
 
-    // Step 3: Delete from main table
+    // ✅ Step 3: Delete all related players
+    const { error: pError } = await supabase
+      .from("game_players")
+      .delete()
+      .eq("game_pass", gamePass);
+    if (pError) throw new Error(pError.message);
+
+    // Step 4: Delete from main table
     const { error: gError } = await supabase
       .from("game_info")
       .delete()
       .eq("id", gameId);
-
     if (gError) throw new Error(gError.message);
 
+    console.log(`✅ Game ${gamePass} and all related data deleted successfully.`);
     return true;
   } catch (err) {
-    console.error("Error deleting game:", err);
+    console.error("❌ Error deleting game:", err);
     throw err;
   }
 }
