@@ -98,6 +98,8 @@ Learn more about Knowda by checking out the documentation:
 ## Video Demo
 Check out the video demo of the knowda app [here](https://drive.google.com/drive/folders/1JU7AbQ_kk4iTo2tsMqDU50fat2WWsB4T)
 
+> Check out the live demo [here](https://knowda.vercel.app)
+
 ## Author
 + Gideon - [@0xGIDHUB](https://github.com/0xGIDHUB)
 
