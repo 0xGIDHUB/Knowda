@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import { useWallet } from "@meshsdk/react";
-import { getGameInfo, joinGame } from "../utils/game";
+import { getGameInfo, joinGame, hasPlayerJoined } from "../utils/game";
 
 export default function JoinGamePage() {
   const router = useRouter();
@@ -50,7 +50,15 @@ export default function JoinGamePage() {
         return;
       }
 
-      // Add player to supabase
+      // 🧠 Step 1.5: Check if player already joined with same wallet
+      const alreadyJoined = await hasPlayerJoined(Number(gamePass), walletAddress);
+
+      if (alreadyJoined) {
+        toast.error("Your wallet address is already a participant in the game!");
+        return;
+      }
+
+      // ✅ Proceed to join the game
       const res = await joinGame(
         Number(gamePass),
         String(walletAddress),

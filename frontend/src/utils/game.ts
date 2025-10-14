@@ -165,7 +165,6 @@ export async function resetGameBeforeActivation(gamePass: number) {
   }
 }
 
-
 /**
  * Delete a game across all related tables by game id
  */
@@ -288,6 +287,28 @@ export const checkGameCapacity = async (gamePass: number): Promise<boolean> => {
 
   return data.current_no_of_participants >= data.max_no_of_participants;
 };
+
+/**
+ * Check if a wallet address has already joined a specific game
+ */
+export async function hasPlayerJoined(gamePass: number, walletAddress: string) {
+  try {
+    const { data, error } = await supabase
+      .from("game_players")
+      .select("id")
+      .eq("game_pass", gamePass)
+      .eq("address", walletAddress)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    // ✅ return true if player exists
+    return !!data;
+  } catch (err) {
+    console.error("Error checking existing player:", err);
+    throw err;
+  }
+}
 
 export async function joinGame(
   gamePass: number,
